@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.env
+.env.*
+.venv/
+
+# Tests
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+jobtracker_pgdata/
+
+# IDE
+.vscode/
+.idea/

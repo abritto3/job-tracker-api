@@ -1,0 +1,5 @@
+[
+  "tests/test_auth_and_applications.py::test_applications_crud",
+  "tests/test_auth_and_applications.py::test_health",
+  "tests/test_auth_and_applications.py::test_register_login_me"
+]

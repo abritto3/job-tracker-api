@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:16
+    container_name: job-tracker-db
+    environment:
+      POSTGRES_USER: jobtracker
+      POSTGRES_PASSWORD: jobtracker
+      POSTGRES_DB: jobtracker
+    ports:
+      - "5432:5432"
+    volumes:
+      - jobtracker_pgdata:/var/lib/postgresql/data
+
+  api:
+    build: .
+    container_name: job-tracker-api
+    environment:
+      DATABASE_URL: postgresql+psycopg://jobtracker:jobtracker@db:5432/jobtracker
+      JWT_SECRET: CHANGE_ME_IN_PROD
+      JWT_ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 60
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+volumes:
+  jobtracker_pgdata:
