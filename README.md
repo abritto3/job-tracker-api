@@ -1,136 +1,218 @@
 # Job Tracker API
 
-I've created a production-ready FastAPI backend for tracking job applications.  
-The project demonstrates authentication, secure multi-user data access, CRUD operations, database migrations, automated testing, CI, Docker, and cloud deployment.
+A backend API for tracking job applications, built to reflect how a real production service is designed, tested, and deployed.
 
+This project was built as part of my job search to demonstrate practical backend engineering skills beyond coursework: authentication, data modelling, API design, testing, CI, and deployment.
 
-Tech stack: FastAPI, PostgreSQL, SQLAlchemy, Alembic, Docker, GitHub Actions, JWT
+Live demo: (add Render URL here)
 
-----------------------------------------------------------------
+---
 
-FEATURES
+## Why this project exists
 
-- JWT authentication using OAuth2 password flow
-- Secure, per-user job application tracking
-- Full CRUD API for job applications
-- Soft delete support
-- Database migrations with Alembic
-- Automated integration tests with pytest
-- Dockerised local and production setup
-- CI pipeline using GitHub Actions
-- Cloud deployment ready (Render + managed PostgreSQL)
+Most portfolio projects stop at “CRUD works locally”.
 
-----------------------------------------------------------------
+This project goes further and focuses on **how a backend service is actually built and run**:
 
-HIGH-LEVEL ARCHITECTURE
+- authenticated, multi-user system
+- data isolation per user
+- migrations instead of manual schema changes
+- automated tests
+- CI pipeline
+- Dockerised deployment
+- cloud hosting with a managed database
+
+The goal is not novelty — it’s **realism**.
+
+---
+
+## What the API does
+
+The API allows users to:
+
+- register and log in securely
+- manage their own job applications
+- track application status (applied, interview, offer, rejected)
+- update notes and links
+- soft-delete applications without losing history
+
+All data is scoped to the authenticated user.
+
+---
+
+## High-level architecture
 
 Client (Swagger UI or frontend)
-  |
-  v
-FastAPI application
-  - Authentication (JWT)
-  - Business logic (CRUD)
-  - Request validation
-  |
-  v
-PostgreSQL database
-  - Users
-  - Job applications
+→ FastAPI application
+→ PostgreSQL database
 
-Each request is authenticated via JWT and scoped to the current user.
-Database schema changes are managed via Alembic migrations.
-The API runs in Docker for consistency across environments.
+Authentication is handled using JWTs (OAuth2 password flow).  
+Each request is authenticated and authorised before accessing data.
 
-----------------------------------------------------------------
+Database schema changes are handled via Alembic migrations.  
+The service runs inside Docker for consistency across environments.
 
-PROJECT STRUCTURE
+---
+
+## Tech stack
+
+- FastAPI
+- PostgreSQL
+- SQLAlchemy
+- Alembic
+- Pydantic
+- Pytest
+- Docker & Docker Compose
+- GitHub Actions
+- Render (deployment)
+
+---
+
+## Project structure
 
 job-tracker-api/
 - app/
-  - auth.py            JWT creation and verification
+  - main.py            Application entry point
+  - auth.py            JWT creation and validation
   - database.py        Database engine and session
   - deps.py            Dependency injection
   - models.py          SQLAlchemy models
-  - schemas.py         Pydantic schemas
+  - schemas.py         Pydantic request/response models
   - routes/
-    - auth.py          Register and login endpoints
+    - auth.py          Registration and login
     - applications.py  Job application CRUD
-  - main.py            Application entrypoint
 - alembic/             Database migrations
-- tests/               Pytest integration tests
+- tests/               Integration tests
 - Dockerfile
 - docker-compose.yml
 - requirements.txt
 - README.md
 
-----------------------------------------------------------------
+---
 
-RUN LOCALLY (DOCKER)
+## Authentication
 
-1. Start the services
+Authentication uses JWTs with OAuth2 password flow.
+
+Typical flow:
+
+1. Register a user  
+   POST /auth/register
+
+2. Log in  
+   POST /auth/login
+
+3. Use the returned token to access protected endpoints
+
+Swagger UI supports this flow directly via the “Authorize” button.
+
+---
+
+## Job application endpoints
+
+- POST /applications  
+  Create a new job application
+
+- GET /applications  
+  List applications for the current user  
+  Supports filtering by status
+
+- PATCH /applications/{id}  
+  Update status or details
+
+- DELETE /applications/{id}  
+  Soft delete (keeps data but hides it by default)
+
+---
+
+## Running locally (Docker)
+
+Start the service and database:
 
 docker compose up -d --build
 
-2. Run database migrations
+Run migrations:
 
 docker exec -it job-tracker-api alembic upgrade head
 
-3. Open Swagger UI
+Open Swagger UI:
 
 http://127.0.0.1:8000/docs
 
-----------------------------------------------------------------
+---
 
-AUTHENTICATION FLOW
-
-1. Register a user
-   POST /auth/register
-
-2. Login
-   POST /auth/login
-
-3. Authorize in Swagger UI
-   Use the "Authorize" button (OAuth2 password flow)
-
-4. Access protected endpoints
-   GET /me
-   CRUD operations on /applications
-
-----------------------------------------------------------------
-
-JOB APPLICATION CRUD
-
-Create application
-POST /applications
-
-List applications
-GET /applications
-Optional query params:
-- status
-- include_inactive
-
-Update application
-PATCH /applications/{id}
-
-Soft delete application
-DELETE /applications/{id}
-
-All job applications are scoped to the authenticated user.
-
-----------------------------------------------------------------
-
-TESTING
+## Testing
 
 The test suite covers:
-- Health endpoint
-- User registration and login
+
+- health check
+- user registration and login
 - JWT-protected endpoints
-- Full job application CRUD lifecycle
+- full job application CRUD lifecycle
+
+Tests run against a real PostgreSQL database.
 
 Run tests locally:
 
 pytest -q
 
-----------------------------------------------------------------
+---
 
+## Continuous Integration
 
+GitHub Actions runs on every push and pull request to main.
+
+The pipeline:
+- starts PostgreSQL
+- installs dependencies
+- runs the full test suite
+
+This ensures changes do not break core functionality.
+
+---
+
+## Deployment
+
+The API is deployed on Render as a Docker web service.
+
+- PostgreSQL is provided as a managed Render database
+- migrations run automatically on startup
+- secrets are configured via environment variables
+- the same Docker image is used locally and in production
+
+---
+
+## Environment variables
+
+DATABASE_URL  
+PostgreSQL connection string
+
+JWT_SECRET  
+Secret used to sign JWTs
+
+JWT_ALGORITHM  
+HS256
+
+ACCESS_TOKEN_EXPIRE_MINUTES  
+Token lifetime
+
+---
+
+## What this project demonstrates
+
+- Designing a secure, multi-user backend API
+- Implementing authentication and authorisation
+- Modelling relational data correctly
+- Managing schema changes with migrations
+- Writing meaningful integration tests
+- Using Docker for reproducible environments
+- Setting up CI pipelines
+- Deploying and running a backend service in the cloud
+
+This project reflects how backend systems are built in practice, not just how endpoints are written.
+
+---
+
+## License
+
+MIT
